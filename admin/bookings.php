@@ -147,7 +147,7 @@
             <!-- ============================================================== -->
             <div class="container-fluid">
 
-            <form method="POST">
+            <form method="POST" action="../mpesa/index.php">
                 
                 <?php
                     $stmt=$mysqli->prepare("SELECT emailid FROM registration WHERE emailid=? ");
