@@ -42,7 +42,7 @@ if (isset($_POST['submit'])) {
     $initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
 
     # Callback URL
-    $CallBackURL = 'https://mydomain.com/callback_url.php';
+    $CallBackURL = 'https://morning-basin-87523.herokuapp.com/callback_url.php';
 
     // Function to get access token
     function getAccessToken($consumerKey, $consumerSecret)
