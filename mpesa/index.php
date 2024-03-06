@@ -93,7 +93,7 @@
 
           <div class="col-12">
             <label for="inputAddress" class="form-label"> The Amount to be paid is Ksh</label>
-            <input type="text" class="form-control" name="amount" readonly placeholder="Enter Amount"
+            <input type="amount" class="form-control" name="amount"  placeholder="Enter Amount"
               value="<?php echo $_POST["ta"]; ?> ">
           </div>
           <div class="col-12">
