@@ -34,7 +34,7 @@ if ($resultCode == 0) {
         require('../includes/pdoconfig.php');
 
         // Prepare SQL statement to insert transaction details into the database
-        $sql = "INSERT INTO transactions (transaction_id, amount, phone_number) VALUES (:transaction_id, :amount, :phone_number)";
+        $sql = "INSERT INTO transactions (transaction_code, amount, phone) VALUES (:transaction_id, :amount, :phone_number)";
 
         // Prepare and execute SQL statement
         $stmt = $DB_con->prepare($sql);

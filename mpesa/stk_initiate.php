@@ -42,7 +42,7 @@ if (isset($_POST['submit'])) {
     $initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
 
     # Callback URL
-    $CallBackURL = 'https://morning-basin-87523.herokuapp.com/callback_url.php';
+    $CallBackURL = 'https://c0b6-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
 
     // Function to get access token
     function getAccessToken($consumerKey, $consumerSecret)
@@ -61,6 +61,7 @@ if (isset($_POST['submit'])) {
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $response = curl_exec($curl);
+        $response = trim($response);
         curl_close($curl);
         $data = json_decode($response, true);
         return $data['access_token'];
