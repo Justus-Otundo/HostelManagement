@@ -1,116 +1,50 @@
 <?php
-// No need to start session or require pdoconfig.php here
+//INCLUDE THE ACCESS TOKEN FILE
+include 'accessToken.php';
+date_default_timezone_set('Africa/Nairobi');
+$processrequestUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+$callbackurl = 'https://0a4f-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
+$passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919";
+$BusinessShortCode = '174379';
+$Timestamp = date('YmdHis');
+// ENCRIPT  DATA TO GET PASSWORD
+$Password = base64_encode($BusinessShortCode . $passkey . $Timestamp);
+$phone = $_POST['phone'];  //phone number to receive the stk push
+$money = $_POST['amount'];
+$PartyA = $phone;
+$PartyB = '174379';
+$AccountReference = 'Hostel Management';
+$TransactionDesc = 'Mpesa Test';
+$Amount = $money;
+$stkpushheader = ['Content-Type:application/json', 'Authorization:Bearer ' . $access_token];
+//INITIATE CURL
+$curl = curl_init();
+curl_setopt($curl, CURLOPT_URL, $processrequestUrl);
+curl_setopt($curl, CURLOPT_HTTPHEADER, $stkpushheader); //setting custom header
+$curl_post_data = array(
+    //Fill in the request parameters with valid values
+    'BusinessShortCode' => $BusinessShortCode,
+    'Password' => $Password,
+    'Timestamp' => $Timestamp,
+    'TransactionType' => 'CustomerPayBillOnline',
+    'Amount' => $Amount,
+    'PartyA' => $PartyA,
+    'PartyB' => $BusinessShortCode,
+    'PhoneNumber' => $PartyA,
+    'CallBackURL' => $callbackurl,
+    'AccountReference' => $AccountReference,
+    'TransactionDesc' => $TransactionDesc
+);
 
-if (isset($_POST['submit'])) {
-    date_default_timezone_set('Africa/Nairobi');
-
-    # Access token
-    $consumerKey = 'ajMuhsGcUJXAGADYCtmSZgJdFIcj9wa0CKpCS1GBTSs9lzxy';
-    $consumerSecret = 'uxHiRgEiU51BeqxiassaLVajLqoyx7avBynMRAAtj9b50SdrCRGZggefhHbv24xS';
-
-    # Define the variables
-    # Provide the following details, this part is found on your test credentials on the developer account
-    $BusinessShortCode = '174379';
-    $Passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
-
-    /*
-    This are your info, for
-    $PartyA should be the ACTUAL clients phone number or your phone number, format 2547********
-    $AccountReference, it may be invoice number, account number, etc., on production systems, but for a test just put anything
-    TransactionDesc can be anything, probably a better description of or the transaction
-    $Amount this is the total invoiced amount, Any amount here will be 
-    actually deducted from a client's side/your test phone number once the PIN has been entered to authorize the transaction. 
-    for developer/test accounts, this money will be reversed automatically by midnight.
-    */
-
-    $PartyA = $_POST['phone']; // This is your phone number, 
-    $AccountReference = '2255';
-    $TransactionDesc = 'Test Payment';
-    $Amount = $_POST['amount'];
-
-    # Get the timestamp, format YYYYmmddhms -> 20181004151020
-    $Timestamp = date('YmdHis');
-
-    # Get the base64 encoded string -> $password. The passkey is the M-PESA Public Key
-    $Password = base64_encode($BusinessShortCode . $Passkey . $Timestamp);
-
-    # Header for access token
-    $headers = ['Content-Type:application/json; charset=utf8'];
-
-    # M-PESA endpoint urls
-    $access_token_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
-    $initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-
-    # Callback URL
-    $CallBackURL = 'https://c0b6-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
-
-    // Function to get access token
-    function getAccessToken($consumerKey, $consumerSecret)
-    {
-        $url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
-        $credentials = base64_encode($consumerKey . ':' . $consumerSecret);
-        $headers = array(
-            'Authorization: Basic ' . $credentials,
-            'Content-Type: application/json'
-        );
-        $options = array(
-            CURLOPT_URL => $url,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true
-        );
-        $curl = curl_init();
-        curl_setopt_array($curl, $options);
-        $response = curl_exec($curl);
-        $response = trim($response);
-        curl_close($curl);
-        $data = json_decode($response, true);
-        return $data['access_token'];
-    }
-
-    // Function to initiate payment
-    function initiatePayment($accessToken, $BusinessShortCode, $Passkey, $PhoneNumber, $Amount, $CallBackURL, $PartyA, $AccountReference, $TransactionDesc)
-    {
-        $initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-        $timestamp = date('YmdHis');
-        $password = base64_encode($BusinessShortCode . $Passkey . $timestamp);
-        $data = array(
-            'BusinessShortCode' => $BusinessShortCode,
-            'Password' => $password,
-            'Timestamp' => $timestamp,
-            'TransactionType' => 'CustomerPayBillOnline',
-            'Amount' => $Amount,
-            'PartyA' => $PartyA,
-            'PartyB' => $BusinessShortCode,
-            'PhoneNumber' => $PhoneNumber,
-            'CallBackURL' => $CallBackURL,
-            'AccountReference' => $AccountReference,
-            'TransactionDesc' => $TransactionDesc
-        );
-        $headers = array(
-            'Authorization: Bearer ' . $accessToken,
-            'Content-Type: application/json'
-        );
-        $options = array(
-            CURLOPT_URL => $initiate_url,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_RETURNTRANSFER => true
-        );
-        $curl = curl_init();
-        curl_setopt_array($curl, $options);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        // Parse JSON response and return as an object
-        return json_decode($response);
-    }
-
-    // Get access token
-    $accessToken = getAccessToken($consumerKey, $consumerSecret);
-
-    // Initiate payment
-    $paymentResponse = initiatePayment($accessToken, $BusinessShortCode, $Passkey, $PartyA, $Amount, $CallBackURL, $PartyA, $AccountReference, $TransactionDesc);
-
-    // Echo response to the user
-    echo "Payment initiated successfully. Please wait for confirmation.";
+$data_string = json_encode($curl_post_data);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
+echo $curl_response = curl_exec($curl);
+//ECHO  RESPONSE
+$data = json_decode($curl_response);
+$CheckoutRequestID = $data->CheckoutRequestID;
+$ResponseCode = $data->ResponseCode;
+if ($ResponseCode == "0") {
+    echo "The CheckoutRequestID for this transaction is : " . $CheckoutRequestID;
 }

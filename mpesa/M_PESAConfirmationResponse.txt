@@ -1,6 +1,0 @@
-
-
-
-
-{"Body":{"stkCallback":{"MerchantRequestID":"53e3-4aa8-9fe0-8fb5e4092cdd731614","CheckoutRequestID":"ws_CO_06032024162152184799993420","ResultCode":1037,"ResultDesc":"DS timeout user cannot be reached"}}}
-{"Body":{"stkCallback":{"MerchantRequestID":"be17-4b49-886b-71ba6eedc4f22121840","CheckoutRequestID":"ws_CO_06032024161910145799993420","ResultCode":0,"ResultDesc":"The service request is processed successfully.","CallbackMetadata":{"Item":[{"Name":"Amount","Value":1.00},{"Name":"MpesaReceiptNumber","Value":"SC656Z9L3V"},{"Name":"Balance"},{"Name":"TransactionDate","Value":20240306162006},{"Name":"PhoneNumber","Value":254799993420}]}}}}

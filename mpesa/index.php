@@ -89,7 +89,7 @@
       <div class="media mt-3 pl-2">
         <!--bs5 input-->
 
-        <form class="row g-3" action="./stk_initiate.php" method="POST">
+        <form class="row g-3" action="stk_initiate.php" method="POST">
 
           <div class="col-12">
             <label for="inputAddress" class="form-label"> The Amount to be paid is Ksh</label>

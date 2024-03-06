@@ -1,55 +1,30 @@
 <?php
+include '../includes/pdoconfig.php';
 header("Content-Type: application/json");
-
-// Default response to M-Pesa
-$response = '{
-    "ResultCode": 0, 
-    "ResultDesc": "Confirmation Received Successfully"
-}';
-
-// Receive M-Pesa response data
-$mpesaResponse = file_get_contents('php://input');
-
-// Log the M-Pesa response to a file
-$logFile = "M_PESAConfirmationResponse.txt";
+$stkCallbackResponse = file_get_contents('php://input');
+$logFile = "Mpesastkresponse.json";
 $log = fopen($logFile, "a");
-fwrite($log, $mpesaResponse . "\n");
+fwrite($log, $stkCallbackResponse);
 fclose($log);
 
-// Decode the JSON response from M-Pesa
-$data = json_decode($mpesaResponse, true);
+$data = json_decode($stkCallbackResponse);
 
-// Extract relevant information from the M-Pesa response
-$resultCode = isset($data['ResultCode']) ? $data['ResultCode'] : null;
-$resultDesc = isset($data['ResultDesc']) ? $data['ResultDesc'] : null;
-$transactionId = isset($data['TransactionID']) ? $data['TransactionID'] : null;
-$amount = isset($data['Amount']) ? $data['Amount'] : null;
-$phoneNumber = isset($data['PhoneNumber']) ? $data['PhoneNumber'] : null;
-
-// Check if the transaction was successful
-if ($resultCode == 0) {
-    // Transaction was successful, update database with transaction details
-    try {
-        // Connect to the database (assuming you have already included pdoconfig.php)
-        require('../includes/pdoconfig.php');
-
-        // Prepare SQL statement to insert transaction details into the database
-        $sql = "INSERT INTO transactions (transaction_code, amount, phone) VALUES (:transaction_id, :amount, :phone_number)";
-
-        // Prepare and execute SQL statement
-        $stmt = $DB_con->prepare($sql);
-        $stmt->bindParam(':transaction_id', $transactionId);
-        $stmt->bindParam(':amount', $amount);
-        $stmt->bindParam(':phone_number', $phoneNumber);
-        $stmt->execute();
-
-        // Log success
-        echo $response;
-    } catch (PDOException $e) {
-        // Log database error
-        echo "Error: " . $e->getMessage();
-    }
-} else {
-    // Transaction failed, log the failure and return appropriate response
-    echo $response;
+$MerchantRequestID = $data->Body->stkCallback->MerchantRequestID;
+$CheckoutRequestID = $data->Body->stkCallback->CheckoutRequestID;
+$ResultCode = $data->Body->stkCallback->ResultCode;
+$ResultDesc = $data->Body->stkCallback->ResultDesc;
+$Amount = $data->Body->stkCallback->CallbackMetadata->Item[0]->Value;
+$TransactionId = $data->Body->stkCallback->CallbackMetadata->Item[1]->Value;
+$UserPhoneNumber = $data->Body->stkCallback->CallbackMetadata->Item[4]->Value;
+//CHECK IF THE TRANSACTION WAS SUCCESSFUL 
+if ($ResultCode == 0) {
+  //STORE THE TRANSACTION DETAILS IN THE DATABASE
+  $stmt = $DB_con->prepare("INSERT INTO transactions (MerchantRequestID,CheckoutRequestID,ResultCode,Amount,MpesaReceiptNumber,PhoneNumber) VALUES (:MerchantRequestID, :CheckoutRequestID, :ResultCode, :Amount, :TransactionId, :UserPhoneNumber)");
+  $stmt->bindParam(':MerchantRequestID', $MerchantRequestID);
+  $stmt->bindParam(':CheckoutRequestID', $CheckoutRequestID);
+  $stmt->bindParam(':ResultCode', $ResultCode);
+  $stmt->bindParam(':Amount', $Amount);
+  $stmt->bindParam(':TransactionId', $TransactionId);
+  $stmt->bindParam(':UserPhoneNumber', $UserPhoneNumber);
+  $stmt->execute();
 }
