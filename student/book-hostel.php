@@ -127,6 +127,28 @@
             <!-- Container fluid  -->
             <!-- ============================================================== -->
             <div class="container-fluid">
+            <form method="POST" action="../mpesa/index.php">
+
+<?php
+$stmt = $mysqli->prepare("SELECT emailid FROM registration WHERE emailid=? ");
+$stmt->bind_param('s', $uid);
+$stmt->execute();
+$stmt->bind_result($email);
+$rs = $stmt->fetch();
+$stmt->close();
+
+if ($rs) { ?>
+    <div class="alert alert-primary alert-dismissible bg-primary text-white border-0 fade show"
+        role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>Info: </strong> You have already booked a hostel!
+    </div>
+<?php } else {
+    echo "";
+}
+?>
                 
                 <form method="POST">
                 
@@ -679,5 +701,65 @@
 
     })});
     </script>
+    <script type="text/javascript">
+        // Function to calculate total amount
+        function calculateTotal() {
+            var fpm = parseFloat(document.getElementById('fpm').value);
+            var duration = parseInt(document.getElementById('duration').value);
+            var foodStatus = parseInt(document.querySelector('input[name="foodstatus"]:checked').value);
 
+            var totalFees = fpm * duration;
+            if (foodStatus === 1) {
+                totalFees += 211 * duration; // Assuming food costs Ksh211 per month
+            }
+
+            document.getElementById('ta').value = totalFees.toFixed(2); // Set total amount
+        }
+
+        // Event listeners for duration and food status fields
+        document.getElementById('duration').addEventListener('change', calculateTotal);
+        document.querySelectorAll('input[name="foodstatus"]').forEach(function (elem) {
+            elem.addEventListener('change', calculateTotal);
+        });
+
+    </script>
+     <script type="text/javascript">
+        function submitForm(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Call PHP script to initiate M-Pesa payment
+            initiateMpesaPayment().then(function (paymentSuccessful) {
+                if (paymentSuccessful) {
+                    // If payment is successful, submit the form
+                    document.querySelector('form').submit();
+                } else {
+                    // Handle payment failure
+                    alert('Payment failed. Please try again.');
+                }
+            });
+        }
+
+        // Function to call PHP script to initiate M-Pesa payment
+        function initiateMpesaPayment() {
+            return new Promise(function (resolve, reject) {
+                var formData = new FormData();
+                var xhr = new XMLHttpRequest();
+                formData.append('phone', document.querySelector('input[name="phone"]').value);
+                formData.append('amount', document.querySelector('input[name="amount"]').value);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            var response = JSON.parse(xhr.responseText);
+                            resolve(response.success); // Resolve with payment success status
+                        } else {
+                            reject(); // Reject if there is an error
+                        }
+                    }
+                };
+                xhr.open('POST', 'mpesa/stk_initiate.php', true); // Adjust the path to your PHP script
+                xhr.send(formData);
+            });
+        }
+    </script>
+    </script>
 </html>

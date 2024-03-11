@@ -727,7 +727,7 @@ if (isset($_POST['submit'])) {
 
             var totalFees = fpm * duration;
             if (foodStatus === 1) {
-                totalFees += 211 * duration; // Assuming food costs $211 per month
+                totalFees += 211 * duration; // Assuming food costs Ksh211 per month
             }
 
             document.getElementById('ta').value = totalFees.toFixed(2); // Set total amount
