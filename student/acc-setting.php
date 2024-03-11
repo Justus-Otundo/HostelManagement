@@ -1,7 +1,7 @@
 <?php
     session_start();
     include('../includes/dbconn.php');
-    date_default_timezone_set('America/Chicago');
+    date_default_timezone_set('Africa/Nairobi');
     include('../includes/check-login.php');
     check_login();
     $ai=$_SESSION['id'];
