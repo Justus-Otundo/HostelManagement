@@ -34,6 +34,10 @@
         <li class="sidebar-item"> <a class="sidebar-link sidebar-link" href="manage-courses.php"
         aria-expanded="false"><i class="fas fa-book"></i><span
         class="hide-menu">Manage Courses</span></a></li>
+
+        <li class="sidebar-item"> <a class="sidebar-link sidebar-link" href="reports.php" 
+        aria-expanded="false"><i class="fas fa-chart-bar"></i><span 
+        class="hide-menu">Reports</span></a></li>
                            
     </ul>
 </nav>
