@@ -20,4 +20,4 @@
       }
     }
   ]
-  
+  {"Body":{"stkCallback":{"MerchantRequestID":"53e3-4aa8-9fe0-8fb5e4092cdd847917","CheckoutRequestID":"ws_CO_12032024075802416799993420","ResultCode":1019,"ResultDesc":"Transaction has expired"}}}{"Body":{"stkCallback":{"MerchantRequestID":"53e3-4aa8-9fe0-8fb5e4092cdd847961","CheckoutRequestID":"ws_CO_12032024080022416702244723","ResultCode":1032,"ResultDesc":"Request cancelled by user"}}}{"Body":{"stkCallback":{"MerchantRequestID":"6e86-45dd-91ac-fd5d4178ab52848217","CheckoutRequestID":"ws_CO_12032024080133477741707130","ResultCode":1037,"ResultDesc":"DS timeout user cannot be reached"}}}
