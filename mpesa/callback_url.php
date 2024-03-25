@@ -2,27 +2,37 @@
 include '../includes/pdoconfig.php';
 require '../vendor/autoload.php';
 
-header("Content-Type: application/json");
-$stkCallbackResponse = file_get_contents('php://input');
-$logFile = "Mpesastkresponse.json";
-$log = fopen($logFile, "a");
-fwrite($log, $stkCallbackResponse);
-fclose($log);
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
+// Set content type to JSON
+header("Content-Type: application/json");
+
+// Get the STK callback response
+$stkCallbackResponse = file_get_contents('php://input');
+
+// Log the STK callback response
+$logFile = "Mpesastkresponse.json";
+file_put_contents($logFile, $stkCallbackResponse . PHP_EOL, FILE_APPEND);
+
+// Decode the JSON data
 $data = json_decode($stkCallbackResponse);
 
-$MerchantRequestID = $data->Body->stkCallback->MerchantRequestID;
-$CheckoutRequestID = $data->Body->stkCallback->CheckoutRequestID;
-$ResultCode = $data->Body->stkCallback->ResultCode;
-$ResultDesc = $data->Body->stkCallback->ResultDesc;
-$Amount = $data->Body->stkCallback->CallbackMetadata->Item[0]->Value;
-$TransactionId = $data->Body->stkCallback->CallbackMetadata->Item[1]->Value;
-$UserPhoneNumber = $data->Body->stkCallback->CallbackMetadata->Item[4]->Value;
+// Extract relevant data
+$stkCallback = $data->Body->stkCallback;
+$MerchantRequestID = $stkCallback->MerchantRequestID;
+$CheckoutRequestID = $stkCallback->CheckoutRequestID;
+$ResultCode = $stkCallback->ResultCode;
+$ResultDesc = $stkCallback->ResultDesc;
+$CallbackMetadata = $stkCallback->CallbackMetadata->Item;
+$Amount = $CallbackMetadata[0]->Value;
+$TransactionId = $CallbackMetadata[1]->Value;
+$UserPhoneNumber = $CallbackMetadata[4]->Value;
 
-//CHECK IF THE TRANSACTION WAS SUCCESSFUL 
+// Check if the transaction was successful 
 if ($ResultCode == 0) {
   try {
-    //STORE THE TRANSACTION DETAILS IN THE DATABASE
+    // Store the transaction details in the database
     $stmt = $DB_con->prepare("INSERT INTO transactions (MerchantRequestID,CheckoutRequestID,ResultCode,Amount,MpesaReceiptNumber,PhoneNumber) VALUES (:MerchantRequestID, :CheckoutRequestID, :ResultCode, :Amount, :TransactionId, :UserPhoneNumber)");
     $stmt->bindParam(':MerchantRequestID', $MerchantRequestID);
     $stmt->bindParam(':CheckoutRequestID', $CheckoutRequestID);
@@ -32,22 +42,21 @@ if ($ResultCode == 0) {
     $stmt->bindParam(':UserPhoneNumber', $UserPhoneNumber);
     $stmt->execute();
 
-    // SEND EMAIL
-    $mail = new PHPMailer\PHPMailer\PHPMailer();
+    // Fetch user email
     $userEmailQuery = $DB_con->prepare("SELECT email FROM userregistration WHERE ContactNo = :UserPhoneNumber");
     $userEmailQuery->bindParam(':UserPhoneNumber', $UserPhoneNumber);
     $userEmailQuery->execute();
     $userEmailResult = $userEmailQuery->fetch(PDO::FETCH_ASSOC);
     $userEmail = $userEmailResult['email'];
 
+    // Send email confirmation
+    $mail = new PHPMailer(true);
     $mail->isSMTP();
     $mail->Host = 'sandbox.smtp.mailtrap.io';
     $mail->SMTPAuth = true;
     $mail->Username = '680465db003b51';
-    $mail->Password = '670b40992a6128';
+    $mail->Password = '680465db003b51';
     $mail->Port = 2525;
-
-    // Set email parameters
     $mail->setFrom('lumumbaharmony@gmail.com', 'Harmony');
     $mail->addAddress($userEmail);
     $mail->Subject = 'Payment Confirmation';
@@ -55,13 +64,15 @@ if ($ResultCode == 0) {
 
     // Send the email
     if ($mail->send()) {
-      echo 'Email sent successfully!';
+      echo json_encode(['status' => 'success', 'message' => 'Email sent successfully!']);
     } else {
       throw new Exception('Error sending email: ' . $mail->ErrorInfo);
     }
   } catch (Exception $e) {
     // Log the error for debugging purposes
     error_log('Error: ' . $e->getMessage(), 0);
-    echo 'An error occurred. Please try again later.';
+    echo json_encode(['status' => 'error', 'message' => 'An error occurred. Please try again later.']);
   }
+} else {
+  echo json_encode(['status' => 'error', 'message' => 'Transaction was not successful.']);
 }
