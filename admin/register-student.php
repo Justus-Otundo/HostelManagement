@@ -1,6 +1,7 @@
 <?php
     session_start();
     include('../includes/dbconn.php');
+    require '../send-email.php';
     if(isset($_POST['submit']))
     {
     $regno=$_POST['regno'];
@@ -13,10 +14,12 @@
     $password=$_POST['password'];
     $password = md5($password);
     $query="INSERT into userRegistration(regNo,firstName,middleName,lastName,gender,contactNo,email,password) values(?,?,?,?,?,?,?,?)";
+
     $stmt = $mysqli->prepare($query);
     $rc=$stmt->bind_param('sssssiss',$regno,$fname,$mname,$lname,$gender,$contactno,$emailid,$password);
     $stmt->execute();
         echo"<script>alert('Student has been Registered!');</script>";
+        mailing();
     }
 ?>
 
