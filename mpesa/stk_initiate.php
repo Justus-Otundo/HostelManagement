@@ -66,7 +66,7 @@ if ($response === false) {
 // Decode response
 $responseData = json_decode($response);
 
-if ($responseData && isset($responseData->ResponseCode) && $responseData->ResponseCode == "0") {
+if ($responseData && isset ($responseData->ResponseCode) && $responseData->ResponseCode == "0") {
     echo "The CheckoutRequestID for this transaction is: " . $responseData->CheckoutRequestID;
 } else {
     echo "Failed to initiate STK push transaction.";
