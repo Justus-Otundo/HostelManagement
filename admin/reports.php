@@ -1,155 +1,269 @@
 <?php
-    // Include the necessary files and perform necessary database queries
-    include('../includes/dbconn.php');
-    $query = "SELECT * FROM userregistration";
-    $result = mysqli_query($mysqli, $query);
+function generateHostelStudentsReport()
+{
+    function fetchHostelStudentsData()
+    {
+        // Fetch data for Hostel Students report from the database
+        // ...
+
+        $DB_host = "localhost";
+        $DB_user = "root";
+        $DB_pass = "";
+        $DB_name = "hostelmsphp";
+
+        try {
+            $DB_con = new PDO("mysql:host={$DB_host};dbname={$DB_name}", $DB_user, $DB_pass);
+            $DB_con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $query = "SELECT firstName, gender, contactNo FROM userregistration";
+            $stmt = $DB_con->query($query);
+
+            if ($stmt) {
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                return null;
+            }
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    $userregistrationData = fetchHostelStudentsData();
+
+    $tableOutput = '<table border="1">';
+    $tableOutput .= '<tr><th>Name</th><th>Gender</th><th>Contact No</th></tr>';
+
+    foreach ($userregistrationData as $student) {
+        $tableOutput .= '<tr>';
+        $tableOutput .= '<td>' . $student['firstName'] . '</td>';
+        $tableOutput .= '<td>' . $student['gender'] . '</td>';
+        $tableOutput .= '<td>' . $student['contactNo'] . '</td>';
+        $tableOutput .= '</tr>';
+    }
+
+    $tableOutput .= '</table>';
+
+    return $tableOutput;
+}
+
+function generateManageRoomsReport()
+{
+    // Fetch data for Manage Rooms report from the database
+    // ...
+
+    // Placeholder code
+    $tableOutput = '<table border="1">';
+    $tableOutput .= '<tr><th>Room Name</th><th>Capacity</th><th>Status</th></tr>';
+    $tableOutput .= '<tr><td>Room 101</td><td>4</td><td>Occupied</td></tr>';
+    $tableOutput .= '<tr><td>Room 102</td><td>2</td><td>Available</td></tr>';
+    $tableOutput .= '</table>';
+
+    return $tableOutput;
+}
+
+function generateManageCoursesReport()
+{
+    // Fetch data for Manage Courses report from the database
+    // ...
+
+    // Placeholder code
+    $tableOutput = '<table border="1">';
+    $tableOutput .= '<tr><th>Course Name</th><th>Instructor</th><th>Enrollment</th></tr>';
+    $tableOutput .= '<tr><td>Mathematics</td><td>John Doe</td><td>30</td></tr>';
+    $tableOutput .= '<tr><td>English Literature</td><td>Jane Smith</td><td>25</td></tr>';
+    $tableOutput .= '</table>';
+
+    return $tableOutput;
+}
+
+function generateViewStudentAccountsReport()
+{
+    // Fetch data for View Student Accounts report from the database
+    // ...
+
+    // Placeholder code
+    $tableOutput = '<table border="1">';
+    $tableOutput .= '<tr><th>Student Name</th><th>Account Balance</th></tr>';
+    $tableOutput .= '<tr><td>John Doe</td><td>$500</td></tr>';
+    $tableOutput .= '<tr><td>Jane Smith</td><td>$750</td></tr>';
+    $tableOutput .= '</table>';
+
+    return $tableOutput;
+}
+
+// Generate the report based on the selected report type
+$reportType = $_GET['report'] ?? '';
+
+switch ($reportType) {
+    case 'hostel_students':
+        $reportTitle = 'Hostel Students Report';
+        $tableOutput = generateHostelStudentsReport();
+        break;
+
+    case 'manage_rooms':
+        $reportTitle = 'Manage Rooms Report';
+        $tableOutput = generateManageRoomsReport();
+        break;
+
+    case 'manage_courses':
+        $reportTitle = 'Manage Courses Report';
+        $tableOutput = generateManageCoursesReport();
+        break;
+
+    case 'view_student_accounts':
+        $reportTitle = 'View Student Accounts Report';
+        $tableOutput = generateViewStudentAccountsReport();
+        break;
+
+    default:
+        $reportTitle = 'Report Management';
+        $tableOutput = '';
+}
 
 ?>
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon.png">
-    <title>Hostel Management System</title>
-    <!-- Custom CSS -->
-    <link href="../assets/extra-libs/c3/c3.min.css" rel="stylesheet">
-    <link href="../assets/libs/chartist/dist/chartist.min.css" rel="stylesheet">
-     <!-- This page plugin CSS -->
-     <link href="../assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="../dist/css/style.min.css" rel="stylesheet">
-
-    <script language="javascript" type="text/javascript">
-    var popUpWin=0;
-    function popUpWindow(URLStr, left, top, width, height){
-        if(popUpWin) {
-         if(!popUpWin.closed) popUpWin.close();
-            }
-            popUpWin = open(URLStr,'popUpWin', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no,copyhistory=yes,width='+510+',height='+430+',left='+left+', top='+top+',screenX='+left+',screenY='+top+'');
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
         }
-    </script>
-    
-     <style>
-        /* Inline CSS for manage-student-accounts.html */
-        
-        /* Style the table */
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            border-radius: 5px;
+            transition: max-height 0.3s ease-out;
+        }
+
+        li {
+            float: left;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            transition: transform 0.3s ease-out;
+        }
+
+        .slide-left {
+            transform: translateX(0);
+        }
+
+        .slide-right {
+            transform: translateX(0);
+        }
+
+        .slide-left:hover {
+            transform: translateX(-10px);
+        }
+
+        .slide-right:hover {
+            transform: translateX(10px);
+        }
+
+        .report-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
         table {
-            width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            width: 100%;
         }
 
-        /* Style table header */
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
         th {
-            padding: 15px;
-            font-weight: bold;
             background-color: #f2f2f2;
         }
 
-        /* Style table rows */
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .print-button {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
         }
 
-        td {
-            padding: 15px;
+        .print-button button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border: 2px solid #333;
         }
 
-        /* Style the report container */
-        #report-container {
-            margin: 20px;
+        .print-button button:hover {
+            background-color: #45a049;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        
+        .dashboard-content {
+            display: none;
+        }
+
+        @media print {
+            .print-button {
+                display: none;
+            }
+
+            .dashboard-content {
+                display: block;
+            }
+
         }
     </style>
 </head>
-
 <body>
-      <!-- ============================================================== -->
-    <!-- Preloader - style you can find in spinners.css -->
-    <!-- ============================================================== -->
-  
-        <!-- ============================================================== -->
-        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
-        <!-- ============================================================== -->
-        <!-- ============================================================== -->
-        <!-- Page wrapper  -->
-        <!-- ============================================================== -->
-        <div class="page-wrapper">
-            <!-- ============================================================== -->
-            <!-- Bread crumb and right sidebar toggle -->
-        
-       
-    <div id="report-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Reg.No</th>
-                    <th>StudentsName</th>
-                    <th>Gender</th>
-                    <th>Contact</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Loop through the query results and populate the table rows
-                while($row = mysqli_fetch_assoc($result)) {
-                    echo '<tr>
-                    <td>'.$row['regNo'].'</td>
-                    <td>'.$row['firstName'].'</td>
-                    <td>'.$row['middleName'].'</td>
-                    <td>'.$row['gender'].'</td>
-                    <td>'.$row['contactNo'].'</td>>
-                    <td>'.$row['email'].'</td>
-                    </tr>';
-                }
-                ?>
-                </tbody>
-            </table>
+    <h1><?php echo $reportTitle; ?></h1>
+    <ul>
+        <li><a href="reports.php?report=hostel_students" class="slide-left">Hostel Students</a></li>
+        <li><a href="reports.php?report=manage_rooms" class="slide-right">Manage Rooms</a></li>
+        <li><a href="reports.php?report=manage_courses" class="slide-left">Manage Courses</a></li>
+        <li><a href="reports.php?report=view_student_accounts" class="slide-right">View Student Accounts</a></li>
+    </ul>
+    <div class="report-container">
+        <?php echo $tableOutput; ?>
     </div>
-            <!-- footer -->
-            <!-- ============================================================== -->
-            <?php include '../includes/footer.php' ?>
-            <!-- ============================================================== -->
-            <!-- End footer -->
-            <!-- ============================================================== -->
-        </div>
-        <!-- ============================================================== -->
-        <!-- End Page wrapper  -->
-        <!-- ============================================================== -->
+
+    <div class="print-button">
+        <button onclick="printReports()">Print</button>
     </div>
-    <!-- ============================================================== -->
-    <!-- End Wrapper -->
-    <!-- ============================================================== -->
-    <!-- End Wrapper -->
-    <!-- ============================================================== -->
-    <!-- All Jquery -->
-    <!-- ============================================================== -->
-    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="../assets/libs/popper.js/dist/umd/popper.min.js"></script>
-    <script src="../assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- apps -->
-    <!-- apps -->
-    <script src="../dist/js/app-style-switcher.js"></script>
-    <script src="../dist/js/feather.min.js"></script>
-    <script src="../assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
-    <script src="../dist/js/sidebarmenu.js"></script>
-    <!--Custom JavaScript -->
-    <script src="../dist/js/custom.min.js"></script>
-    <!--This page JavaScript -->
-    <script src="../assets/extra-libs/c3/d3.min.js"></script>
-    <script src="../assets/extra-libs/c3/c3.min.js"></script>
-    <script src="../assets/libs/chartist/dist/chartist.min.js"></script>
-    <script src="../assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
-    <script src="../dist/js/pages/dashboards/dashboard1.min.js"></script>
-    <script src="../assets/extra-libs/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="../dist/js/pages/datatable/datatable-basic.init.js"></script>
 
-
+    <script>
+        function printReports() {
+            window.print();
+        }
+    </script>
+    
 </body>
 </html>
