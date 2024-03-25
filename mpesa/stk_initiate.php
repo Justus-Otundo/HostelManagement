@@ -1,50 +1,76 @@
 <?php
-//INCLUDE THE ACCESS TOKEN FILE
+// Include the access token file
 include 'accessToken.php';
-date_default_timezone_set('Africa/Nairobi');
-$processrequestUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-$callbackurl = 'https://e6f5-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
-$passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919";
-$BusinessShortCode = '174379';
-$Timestamp = date('YmdHis');
-// ENCRIPT  DATA TO GET PASSWORD
-$Password = base64_encode($BusinessShortCode . $passkey . $Timestamp);
-$phone = $_POST['phone'];  //phone number to receive the stk push
-$money = $_POST['amount'];
-$PartyA = $phone;
-$PartyB = '254708374149';
-$AccountReference = 'Oscars Hostel Management';
-$TransactionDesc = 'Mpesa Test';
-$Amount = $money;
-$stkpushheader = ['Content-Type:application/json', 'Authorization:Bearer ' . $access_token];
-//INITIATE CURL
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_URL, $processrequestUrl);
-curl_setopt($curl, CURLOPT_HTTPHEADER, $stkpushheader); //setting custom header
-$curl_post_data = array(
-    //Fill in the request parameters with valid values
-    'BusinessShortCode' => $BusinessShortCode,
-    'Password' => $Password,
-    'Timestamp' => $Timestamp,
-    'TransactionType' => 'CustomerPayBillOnline',
-    'Amount' => $Amount,
-    'PartyA' => $PartyA,
-    'PartyB' => $BusinessShortCode,
-    'PhoneNumber' => $PartyA,
-    'CallBackURL' => $callbackurl,
-    'AccountReference' => $AccountReference,
-    'TransactionDesc' => $TransactionDesc
-);
 
-$data_string = json_encode($curl_post_data);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_POST, true);
-curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-echo $curl_response = curl_exec($curl);
-//ECHO  RESPONSE
-$data = json_decode($curl_response);
-$CheckoutRequestID = $data->CheckoutRequestID;
-$ResponseCode = $data->ResponseCode;
-if ($ResponseCode == "0") {
-    echo "The CheckoutRequestID for this transaction is : " . $CheckoutRequestID;
+date_default_timezone_set('Africa/Nairobi');
+
+// Define API endpoints and parameters
+$processRequestUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+$callbackUrl = 'https://e6f5-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
+$passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919";
+$businessShortCode = '174379';
+$timestamp = date('YmdHis');
+$phone = $_POST['phone'] ?? ''; // Phone number to receive the STK push
+$money = $_POST['amount'] ?? ''; // Amount of money
+$partyA = $phone;
+$partyB = '254708374149';
+$accountReference = 'Oscars Hostel Management';
+$transactionDesc = 'Mpesa Test';
+$amount = $money;
+
+// Encrypt data to get password
+$password = base64_encode($businessShortCode . $passkey . $timestamp);
+
+// Prepare request data
+$requestData = [
+    'BusinessShortCode' => $businessShortCode,
+    'Password' => $password,
+    'Timestamp' => $timestamp,
+    'TransactionType' => 'CustomerPayBillOnline',
+    'Amount' => $amount,
+    'PartyA' => $partyA,
+    'PartyB' => $businessShortCode,
+    'PhoneNumber' => $partyA,
+    'CallBackURL' => $callbackUrl,
+    'AccountReference' => $accountReference,
+    'TransactionDesc' => $transactionDesc
+];
+
+$requestJson = json_encode($requestData);
+
+// Set custom headers
+$stkPushHeaders = [
+    'Content-Type: application/json',
+    'Authorization: Bearer ' . $access_token
+];
+
+// Initiate cURL request
+$curl = curl_init();
+curl_setopt_array($curl, [
+    CURLOPT_URL => $processRequestUrl,
+    CURLOPT_HTTPHEADER => $stkPushHeaders,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => $requestJson
+]);
+
+// Execute cURL request and handle response
+$response = curl_exec($curl);
+
+if ($response === false) {
+    // Handle cURL error
+    echo 'cURL Error: ' . curl_error($curl);
+    exit;
 }
+
+// Decode response
+$responseData = json_decode($response);
+
+if ($responseData && isset($responseData->ResponseCode) && $responseData->ResponseCode == "0") {
+    echo "The CheckoutRequestID for this transaction is: " . $responseData->CheckoutRequestID;
+} else {
+    echo "Failed to initiate STK push transaction.";
+}
+
+// Close cURL session
+curl_close($curl);
