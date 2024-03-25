@@ -23,10 +23,10 @@ function mailing()
     $phpmailer->Host = 'sandbox.smtp.mailtrap.io';
     $phpmailer->SMTPAuth = true;
     $phpmailer->Port = 2525;
-    $phpmailer->Username = '680465db003b51';
-    $phpmailer->Password = '670b40992a6128';
+    $phpmailer->Username = '66927f37867fce';
+    $phpmailer->Password = '8bacdf153faac5';
 
-    $phpmailer->setFrom('lumumbaharmony@gmail.com', 'Harmony Lumumba');
+    $phpmailer->setFrom('justusotundo86@gmail.com', 'Justus Otundo');
     $phpmailer->addAddress($_POST['email'], $_POST['fname']);
     $phpmailer->Subject = $subject; // Using $subject directly
     $phpmailer->Body = $message; // Using $message directly
