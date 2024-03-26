@@ -54,10 +54,10 @@ if ($ResultCode == 0) {
     $mail->isSMTP();
     $mail->Host = 'sandbox.smtp.mailtrap.io';
     $mail->SMTPAuth = true;
-    $mail->Username = '680465db003b51';
-    $mail->Password = '680465db003b51';
+    $mail->Username = '66927f37867fce';
+    $mail->Password = '8bacdf153faac5';
     $mail->Port = 2525;
-    $mail->setFrom('lumumbaharmony@gmail.com', 'Harmony');
+    $mail->setFrom('justusotundo86@gmail.com', 'Justus');
     $mail->addAddress($userEmail);
     $mail->Subject = 'Payment Confirmation';
     $mail->Body = 'Your payment of $' . $Amount . ' was successful. Thank you!';

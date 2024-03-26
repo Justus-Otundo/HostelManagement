@@ -6,7 +6,7 @@ date_default_timezone_set('Africa/Nairobi');
 
 // Define API endpoints and parameters
 $processRequestUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-$callbackUrl = 'https://e6f5-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
+$callbackUrl = 'https://4e1e-102-217-157-219.ngrok-free.app/HostelManagement/mpesa/callback_url.php';
 $passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919";
 $businessShortCode = '174379';
 $timestamp = date('YmdHis');
