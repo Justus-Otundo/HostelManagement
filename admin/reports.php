@@ -1,43 +1,85 @@
 <?php
+    function fetchDataFromDatabase($query)
+{
+    $DB_host = "localhost";
+    $DB_user = "root";
+    $DB_pass = "";
+    $DB_name = "hostelmsphp";
+
+    try {
+        $DB_con = new PDO("mysql:host={$DB_host};dbname={$DB_name}", $DB_user, $DB_pass);
+        $DB_con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $DB_con->query($query);
+
+        if ($stmt) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return null;
+        }
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+}
+
 function generateHostelStudentsReport()
 {
-    function fetchHostelStudentsData()
-    {
-        // Fetch data for Hostel Students report from the database
-        // ...
-
-        $DB_host = "localhost";
-        $DB_user = "root";
-        $DB_pass = "";
-        $DB_name = "hostelmsphp";
-
-        try {
-            $DB_con = new PDO("mysql:host={$DB_host};dbname={$DB_name}", $DB_user, $DB_pass);
-            $DB_con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $query = "SELECT firstName, gender, contactNo FROM userregistration";
-            $stmt = $DB_con->query($query);
-
-            if ($stmt) {
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                return null;
-            }
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
-    }
-
-    $userregistrationData = fetchHostelStudentsData();
+    $query = "SELECT regNo, regDate, firstName, gender, contactNo, email FROM userregistration";
+    $HostelStudentsData = fetchDataFromDatabase($query);
 
     $tableOutput = '<table border="1">';
-    $tableOutput .= '<tr><th>Name</th><th>Gender</th><th>Contact No</th></tr>';
+    $tableOutput .= '<tr><th>Reg No</th><th>Reg Date</th><th>Students Name</th><th>Gender</th><th>Contact No</th><th>Email</th></tr>';
 
-    foreach ($userregistrationData as $student) {
+    foreach ($HostelStudentsData as $student) {
         $tableOutput .= '<tr>';
+        $tableOutput .= '<td>' . $student['regNo'] . '</td>';
+        $tableOutput .= '<td>' . $student['regDate'] . '</td>';
         $tableOutput .= '<td>' . $student['firstName'] . '</td>';
         $tableOutput .= '<td>' . $student['gender'] . '</td>';
         $tableOutput .= '<td>' . $student['contactNo'] . '</td>';
+        $tableOutput .= '<td>' . $student['email'] . '</td>';
+        $tableOutput .= '</tr>';
+    }
+
+    $tableOutput .= '</table>';
+
+    return $tableOutput;
+
+}
+function generateManageRoomsReport()
+{
+    $query = "SELECT room_no, fees, seater FROM rooms";
+    $manageRoomsData = fetchDataFromDatabase($query);
+
+    $tableOutput = '<table border="1">';
+    $tableOutput .= '<tr><th>Room No</th><th>Fees</th><th>Seater</th></tr>';
+
+    foreach ($manageRoomsData as $room) {
+        $tableOutput .= '<tr>';
+        $tableOutput .= '<td>' . $room['room_no'] . '</td>';
+        $tableOutput .= '<td>' . $room['fees'] . '</td>';
+        $tableOutput .= '<td>' . $room['seater'] . '</td>';
+        $tableOutput .= '</tr>';
+    }
+
+    $tableOutput .= '</table>';
+
+    return $tableOutput;
+}
+    
+function generateManageCoursesReport()
+{
+    $query = "SELECT course_fn, course_sn, course_code FROM courses";
+    $ManageCoursesData = fetchDataFromDatabase($query);
+
+    $tableOutput = '<table border="1">';
+    $tableOutput .= '<tr><th>Course Full Name</th><th>Course Shortform</th><th>Course Code</th></tr>';
+
+    foreach ($ManageCoursesData as $course) {
+        $tableOutput .= '<tr>';
+        $tableOutput .= '<td>' . $course['course_fn'] . '</td>';
+        $tableOutput .= '<td>' . $course['course_sn'] . '</td>';
+        $tableOutput .= '<td>' . $course['course_code'] . '</td>';
         $tableOutput .= '</tr>';
     }
 
@@ -46,46 +88,27 @@ function generateHostelStudentsReport()
     return $tableOutput;
 }
 
-function generateManageRoomsReport()
-{
-    // Fetch data for Manage Rooms report from the database
-    // ...
-
-    // Placeholder code
-    $tableOutput = '<table border="1">';
-    $tableOutput .= '<tr><th>Room Name</th><th>Capacity</th><th>Status</th></tr>';
-    $tableOutput .= '<tr><td>Room 101</td><td>4</td><td>Occupied</td></tr>';
-    $tableOutput .= '<tr><td>Room 102</td><td>2</td><td>Available</td></tr>';
-    $tableOutput .= '</table>';
-
-    return $tableOutput;
-}
-
-function generateManageCoursesReport()
-{
-    // Fetch data for Manage Courses report from the database
-    // ...
-
-    // Placeholder code
-    $tableOutput = '<table border="1">';
-    $tableOutput .= '<tr><th>Course Name</th><th>Instructor</th><th>Enrollment</th></tr>';
-    $tableOutput .= '<tr><td>Mathematics</td><td>John Doe</td><td>30</td></tr>';
-    $tableOutput .= '<tr><td>English Literature</td><td>Jane Smith</td><td>25</td></tr>';
-    $tableOutput .= '</table>';
-
-    return $tableOutput;
-}
-
 function generateViewStudentAccountsReport()
 {
-    // Fetch data for View Student Accounts report from the database
-    // ...
+    $query = "SELECT regno, firstName, gender, roomno, contactno, emailid, guardianName, guardianRelation FROM registration";
+    $ViewStudentsAccountsData = fetchDataFromDatabase($query);
 
-    // Placeholder code
     $tableOutput = '<table border="1">';
-    $tableOutput .= '<tr><th>Student Name</th><th>Account Balance</th></tr>';
-    $tableOutput .= '<tr><td>John Doe</td><td>$500</td></tr>';
-    $tableOutput .= '<tr><td>Jane Smith</td><td>$750</td></tr>';
+    $tableOutput .= '<tr><th>Reg No</th><th>Students Name</th><th>Gender</th><th>Room No</th><th>Contact No</th><th>Email<th>Guardians Name</th><th>Guardians Relation</th></tr>';
+
+    foreach ($ViewStudentsAccountsData as $account) {
+        $tableOutput .= '<tr>';
+        $tableOutput .= '<td>' . $account['regno'] . '</td>';
+        $tableOutput .= '<td>' . $account['firstName'] . '</td>';
+        $tableOutput .= '<td>' . $account['gender'] . '</td>';
+        $tableOutput .= '<td>' . $account['roomno'] . '</td>';
+        $tableOutput .= '<td>' . $account['contactno'] . '</td>';
+        $tableOutput .= '<td>' . $account['emailid'] . '</td>';
+        $tableOutput .= '<td>' . $account['guardianName'] . '</td>';
+        $tableOutput .= '<td>' . $account['guardianRelation'] . '</td>';
+        $tableOutput .= '</tr>';
+    }
+
     $tableOutput .= '</table>';
 
     return $tableOutput;
@@ -241,6 +264,35 @@ switch ($reportType) {
             }
 
         }
+
+        .return-button {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .return-button button {
+            background-color: red; /* Set button background color to red */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border: 2px solid #333;
+        }
+
+        .return-button button:hover {
+            background-color: #ff0000; /* Set button hover background color to a darker shade of red */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        
     </style>
 </head>
 <body>
@@ -257,11 +309,15 @@ switch ($reportType) {
 
     <div class="print-button">
         <button onclick="printReports()">Print</button>
+        <button onclick="returnToDashboard()">Return</button> <!-- New return button -->
     </div>
 
     <script>
         function printReports() {
             window.print();
+        }
+        function returnToDashboard() {
+            window.location.href = "dashboard.php"; // Replace "dashboard.php" with the actual URL of your dashboard page
         }
     </script>
     
