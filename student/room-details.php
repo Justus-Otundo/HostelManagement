@@ -23,7 +23,32 @@
     <link href="../assets/libs/chartist/dist/chartist.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../dist/css/style.min.css" rel="stylesheet">
-    
+    <style>
+        .print-button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+            animation: glowing 2s infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes glowing {
+            0% {
+                box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 123, 255, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -213,6 +238,7 @@
                                             } ?>
 
                                         </tbody>
+                                        <button class="btn btn-primary print-button" onclick="printPage()">Print</button>
                                     </table>
                                    
                                 </div>
@@ -268,6 +294,11 @@
     <script src="../assets/libs/chartist/dist/chartist.min.js"></script>
     <script src="../assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
     <script src="../dist/js/pages/dashboards/dashboard1.min.js"></script>
+    <script>
+        function printPage() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

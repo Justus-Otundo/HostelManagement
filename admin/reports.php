@@ -226,8 +226,19 @@ switch ($reportType) {
             display: block;
             margin-top: 20px;
             text-align: center;
+            animation: glowing 2s infinite;
         }
-
+        @keyframes glowing {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+  }
+}
         .print-button button {
             background-color: #4CAF50;
             color: white;
@@ -242,6 +253,7 @@ switch ($reportType) {
             border-radius: 5px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             border: 2px solid #333;
+
         }
 
         .print-button button:hover {
