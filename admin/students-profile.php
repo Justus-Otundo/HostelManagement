@@ -206,7 +206,7 @@
                                           ;?> </td>
 
                                           <td><b>Fees Per Month :</b></td>
-                                          <td>$<?php echo $fpm=$row->feespm;?></td>
+                                          <td>KSh<?php echo $fpm=$row->feespm;?></td>
 
                                           
 
@@ -216,9 +216,9 @@
                                           <td colspan="6"><b>Total Fees (<?php echo ($dr).' months'?>) : 
                                           <?php if($row->foodstatus==1){ 
                                           $fd=211; 
-                                          echo '$'.(($fd+$fpm)*$dr);
+                                          echo 'KSh'.(($fd+$fpm)*$dr);
                                           } else {
-                                          echo '$'.$dr*$fpm;
+                                          echo 'KSh'.$dr*$fpm;
                                           }
                                           ?></b></td>
                                           </tr>
